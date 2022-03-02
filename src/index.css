@@ -1,8 +1,4 @@
 @value makerBeige from "./common/color.css";
-@font-face {
-  font-family: "kotra";
-  src: url("./common/fonts/kotra.otf");
-}
 
 body {
   margin: 0;

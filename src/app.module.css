@@ -1,33 +1,59 @@
 .container {
-  width: 100%;
   height: 100vh;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
-.out {
+.slide_box {
+  position: relative;
+  width: 25rem;
+  overflow: hidden;
+}
+.slide_list_wrapper {
   width: 100%;
   height: 100%;
+  background-color: blue;
+}
+.slide_list {
   display: flex;
-  justify-content: center;
+}
+.slide_content {
+  width: 400px;
+  display: flex;
   align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.slide_content img {
+  width: 100%;
+  height: 100%;
+}
+
+.slide_operation {
+  display: flex;
   position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translate(-50%, -50%);
 }
 
-.door {
-  width: 20rem;
-  display: flex;
-  cursor: pointer;
+.slide_btn {
+  width: 2rem;
+  height: 2rem;
+  background-color: white;
+  border-radius: 50%;
+  text-align: center;
 }
-.doorOpen {
-  width: 20rem;
-  display: none;
-  cursor: pointer;
+.dots {
+  display: flex;
 }
 
-.entrance:hover .doorOpen {
-  display: flex;
-}
-.entrance:hover .door {
-  display: none;
+.dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  background-color: white;
+  margin: 0.5rem;
+  border-radius: 50%;
 }

@@ -1,71 +1,102 @@
-import React, { useRef, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import styles from "./app.module.css";
-import Header from "./components/header/header";
-import MakeCoffee from "./components/makeCoffee/makeCoffee";
-import OrderCoffee from "./components/orderCoffee/orderCoffee";
-import Door from "./common/images/door.png";
-import DoorOpen from "./common/images/doorOpen.png";
-import openDoor from "./common/sound/doorOpen.mp3";
-import Bgm from "./common/sound/bgm.mp3";
+import { IoIosArrowBack } from "react-icons/io";
+import { IoIosArrowForward } from "react-icons/io";
+type Style = {
+  width?: string;
+  transition?: string;
+  transform?: string;
+};
 function App() {
-  const [isPlay, setIsPlay] = useState(false);
-  const [isIn, setIsIn] = useState(false);
-  const [isOrder, setIsOrder] = useState(false);
-  const [order, setOrder] = useState<CoffeeOrder | undefined>();
-  const audioRef = useRef<HTMLAudioElement>(null);
-  const doorSound = new Audio(openDoor);
-  function receiveOrder(coffee: CoffeeOrder) {
-    setIsOrder(true);
-    setOrder(coffee);
-  }
-  function goHome() {
-    setIsIn(false);
-    setIsOrder(false);
-    audioRef.current!.currentTime = 0;
-    stopMusic();
+  const [slideItems, setSlideItems] = useState([
+    "https://cdn.pixabay.com/photo/2016/01/05/17/51/maltese-1123016__340.jpg",
+    "https://cdn.pixabay.com/photo/2019/08/07/14/11/dog-4390885__340.jpg",
+    "https://cdn.pixabay.com/photo/2019/07/30/05/53/dog-4372036__340.jpg",
+    "https://cdn.pixabay.com/photo/2016/01/11/22/38/animal-1134504__340.jpg",
+    "https://cdn.pixabay.com/photo/2017/06/28/04/07/dog-2449668__340.jpg",
+  ]);
+  const size = slideItems.length;
+
+  const slideWidth = 400;
+  const slideSpeed = 300;
+  const [currentLoopIdx, setCurrentLoopIdx] = useState(0);
+
+  useEffect(() => {}, []);
+
+  const getStaticIndex = useCallback(
+    (loopIndex) => {
+      let rest = loopIndex % size;
+      if (rest < 0) {
+        rest += size;
+      }
+      return rest;
+    },
+    [size]
+  );
+  function movePrev() {
+    setCurrentLoopIdx(currentLoopIdx - 1);
   }
 
-  function enter() {
-    setIsIn(true);
-    playMusic();
-    doorSound.play();
-  }
-
-  function playMusic() {
-    setIsPlay(true);
-    audioRef.current!.play();
-  }
-  function stopMusic() {
-    setIsPlay(false);
-    audioRef.current!.pause();
-  }
+  function moveNext() {}
 
   return (
     <div className={styles.container}>
-      <Header
-        goHome={goHome}
-        isPlay={isPlay}
-        playMusic={playMusic}
-        stopMusic={stopMusic}
-      />
-      <audio ref={audioRef} src={Bgm} />
-      {!isIn ? (
-        <div className={styles.out}>
-          <div className={styles.entrance}>
-            <img className={styles.door} src={Door} alt="door" />
-            <img
-              className={styles.doorOpen}
-              src={DoorOpen}
-              alt="doorOpen"
-              onClick={enter}
-            />
+      <h2>Carousel-1</h2>
+      <section className={styles.slide_box}>
+        <div
+          className={styles.slide_list_wrapper}
+          style={{
+            transform: `translateX(${
+              -slideWidth * size - slideWidth * currentLoopIdx
+            }px)`,
+            transition: "0.2s",
+          }}
+        >
+          <div
+            className={styles.slide_list}
+            style={{
+              width: `${slideWidth * (size * 2 + 1)}px`,
+              transform: `translateX(${slideWidth * currentLoopIdx}px)`,
+              display: "flex",
+            }}
+          >
+            {Array(size * 2 + 1)
+              .fill(1)
+              .map((_, index) => {
+                console.log("redraw");
+                const loopIndexToShow = currentLoopIdx + index - size;
+                return {
+                  staticIndex: getStaticIndex(loopIndexToShow),
+                  loopIndexToShow,
+                };
+              })
+              .map(({ staticIndex, loopIndexToShow }, index) => (
+                <div className={styles.slide_content} key={loopIndexToShow}>
+                  <img src={slideItems[staticIndex]} alt="slideContent" />
+                </div>
+              ))}
           </div>
         </div>
-      ) : !isOrder ? (
-        <OrderCoffee receiveOrder={receiveOrder} /> //
-      ) : (
-        <MakeCoffee order={order} goHome={goHome} />
-      )}
+        <div className={styles.slide_operation}>
+          <button
+            className={`${styles.slide_btn} ${styles.prev}`}
+            onClick={() => setCurrentLoopIdx(currentLoopIdx - 1)}
+          >
+            <IoIosArrowBack />
+          </button>
+          <ul className={styles.dots}>
+            {[...Array(size)].map((n, index) => (
+              <li className={styles.dot}></li>
+            ))}
+          </ul>
+          <button
+            className={`${styles.slide_btn} ${styles.next}`}
+            onClick={() => setCurrentLoopIdx(currentLoopIdx + 1)}
+          >
+            <IoIosArrowForward />
+          </button>
+        </div>
+      </section>
     </div>
   );
 }

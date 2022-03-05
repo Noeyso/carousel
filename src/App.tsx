@@ -18,7 +18,7 @@ function App() {
   const size = slideItems.length;
 
   const slideWidth = 400;
-  const slideSpeed = 300;
+  const slideSpeed = 3000;
   const [currentLoopIdx, setCurrentLoopIdx] = useState(0);
 
   useEffect(() => {}, []);
@@ -33,11 +33,23 @@ function App() {
     },
     [size]
   );
-  function movePrev() {
-    setCurrentLoopIdx(currentLoopIdx - 1);
-  }
 
-  function moveNext() {}
+  React.useLayoutEffect(() => {
+    let intervalId = setInterval(() => {
+      setCurrentLoopIdx(currentLoopIdx + 1);
+    }, slideSpeed);
+
+    return () => clearTimeout(intervalId);
+  }, [setCurrentLoopIdx, currentLoopIdx]);
+
+  const getNearestLoopIndex = React.useCallback(
+    (staticIndex) => {
+      const currentStaticIndex = getStaticIndex(currentLoopIdx);
+      const diff = staticIndex - currentStaticIndex;
+      return currentLoopIdx + diff;
+    },
+    [currentLoopIdx, getStaticIndex]
+  );
 
   return (
     <div className={styles.container}>
@@ -86,7 +98,15 @@ function App() {
           </button>
           <ul className={styles.dots}>
             {[...Array(size)].map((n, index) => (
-              <li className={styles.dot}></li>
+              <li
+                key={index}
+                className={
+                  getStaticIndex(currentLoopIdx) === index
+                    ? `${styles.dot} ${styles.dot_selected}`
+                    : styles.dot
+                }
+                onClick={() => setCurrentLoopIdx(getNearestLoopIndex(index))}
+              ></li>
             ))}
           </ul>
           <button
